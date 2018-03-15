@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <div class="station">
-      <h1>{{station.name}}</h1>
       <div class="direction">{{station.direction}}</div>
     </div>
 
@@ -56,6 +55,10 @@ export default {
     // clear previous data
     this.lineList = [];
     this.activeLineIndex = null;
+
+    wx.setNavigationBarTitle({
+      title: this.station.name,
+    });
     this.loadData();
   },
   async onPullDownRefresh() {
@@ -82,7 +85,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$color-primary: #1aad19;
+@import '~@/variables.scss';
 
 @keyframes circle {
   100% { transform: rotate(360deg); }
@@ -90,16 +93,11 @@ $color-primary: #1aad19;
 
 .station {
   text-align: center;
-
-  > h1 {
-    font-size: 20px;
-    font-weight: 500;
-  }
 }
 
 .direction {
   color: #666;
-  font-size: 16px;
+  font-size: $font-size-m;
   margin-top: 8px;
 }
 
@@ -118,7 +116,7 @@ $color-primary: #1aad19;
     }
 
     > h2 {
-      font-size: 16px;
+      font-size: $font-size;
     }
   }
 
@@ -148,7 +146,7 @@ $color-primary: #1aad19;
   }
 
   &-info {
-    font-size: 12px;
+    font-size: $font-size-xs;
     margin-top: 5px;
     color: #999;
     opacity: 0.3;
@@ -161,7 +159,7 @@ $color-primary: #1aad19;
 
 strong {
   display: inline;
-  font-size: 20px;
+  font-size: $font-size-l;
   color: $color-primary;
 }
 </style>
