@@ -26,14 +26,8 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
-			"list": [
-				{
-					"id": -1,
-					"name": "home",
-					"pathName": "pages/index/index"
-				}
-			]
+			"current": -1,
+			"list": []
 		}
 	}
 }
