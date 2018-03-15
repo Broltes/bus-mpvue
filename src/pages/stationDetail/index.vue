@@ -2,6 +2,11 @@
   <div class="container">
     <div class="station">
       <div class="direction">{{station.direction}}</div>
+
+      <div class="station-like" @click="toggleLike">
+        <img v-if="liked" mode="aspectFit" src="/static/img/like_active.png">
+        <img v-else mode="aspectFit" src="/static/img/like.png">
+      </div>
     </div>
 
     <ul class="line-list">
@@ -50,6 +55,10 @@ export default {
     station() {
       return store.state.currentStation;
     },
+    liked() {
+      const { likedStationDic, currentStation } = store.state;
+      return likedStationDic[currentStation.stopId];
+    },
   },
   async mounted() {
     // clear previous data
@@ -77,8 +86,14 @@ export default {
         work: item.workTimeList && item.workTimeList.join(' - '),
       }));
     },
+
     selectLine(index) {
       this.activeLineIndex = index;
+    },
+
+    toggleLike() {
+      const actionName = this.liked ? 'unlikeStation' : 'likeStation';
+      store.dispatch(actionName, this.station);
     },
   },
 };
@@ -92,13 +107,25 @@ export default {
 }
 
 .station {
+  margin-top: 8px;
   text-align: center;
+  position: relative;
+
+  &-like {
+    position: absolute;
+    right: 1em;
+    top: 3px;
+
+    > img {
+      height: 20px;
+      width: 20px;
+    }
+  }
 }
 
 .direction {
   color: #666;
   font-size: $font-size-m;
-  margin-top: 8px;
 }
 
 .line {

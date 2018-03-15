@@ -1,13 +1,18 @@
 <template>
   <div class="container">
     <search-nav placeholder="搜索站牌" url="/pages/stationSearch/stationSearch"></search-nav>
-    <h2>附近公交站</h2>
+
+    <h2 v-if="likedList[0]">收藏的公交站牌</h2>
+    <station-list :list="likedList"></station-list>
+
+    <h2>附近公交站牌</h2>
     <station-list :list="nearbyList"></station-list>
   </div>
 </template>
 
 <script>
 import api from '@/api';
+import store from '@/store';
 import SearchNav from '@/components/SearchNav';
 import StationList from '@/components/StationList';
 
@@ -21,8 +26,21 @@ export default {
       nearbyList: [],
     };
   },
-  async mounted() {
+  computed: {
+    likedList() {
+      const { likedStationDic } = store.state;
+      const list = Object.values(likedStationDic);
+
+      return list;
+    },
+  },
+  mounted() {
     this.loadData();
+  },
+  onShow() {
+    // bugfix: 在详情页收藏后回来，没有更新收藏列表
+    // 猜测：页面处于未激活状态时，组件没有针对数据变更重新渲染
+    this.$forceUpdate();
   },
   async onPullDownRefresh() {
     await this.loadData();
