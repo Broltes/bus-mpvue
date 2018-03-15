@@ -1,19 +1,35 @@
 <template>
   <div class="container">
-    <h1>{{station.name}}</h1>
-    <div class="direction">{{station.direction}}</div>
-    <ul class="line-list">
-      <li class="line-item" v-for="(item, index) in lineList" :key="index">
-        <h2><strong>{{item.no}}</strong> {{item.direction}}</h2>
+    <div class="station">
+      <h1>{{station.name}}</h1>
+      <div class="direction">{{station.direction}}</div>
+    </div>
 
-        <div class="line-work" v-if="item.work">
-          首末班车时间：{{item.work}}
+    <ul class="line-list">
+      <li
+        :class="[{ _active: index == activeLineIndex }, 'line-item']"
+        v-for="(item, index) in lineList"
+        :key="index"
+        @click="selectLine(index)"
+      >
+        <h2><strong>{{item.name}}</strong> {{item.direction}}</h2>
+
+        <div class="line-info">
+          <div class="line-work" v-if="item.work">
+            首末班车时间：{{item.work}}
+          </div>
+
+          <h3 v-if="item.arriveMinutes != null && item.arriveMinutes >= 0">
+            预计 <strong>{{item.arriveMinutes}}</strong> 分钟后到达
+          </h3>
+          <h3 v-else>暂无来车信息</h3>
         </div>
 
-        <h3 v-if="item.arriveMinutes != null && item.arriveMinutes >= 0">
-          预计 <strong>{{item.arriveMinutes}}</strong> 分钟后到达
-        </h3>
-        <h3 v-else>暂无来车信息</h3>
+        <img
+          @click="loadData"
+          :class="[{ _loading: loading }, 'line-refresh']"
+          mode="aspectFit"
+          src="/static/img/refresh.png">
       </li>
     </ul>
   </div>
@@ -27,6 +43,8 @@ export default {
   data() {
     return {
       lineList: [],
+      activeLineIndex: null,
+      loading: false,
     };
   },
   computed: {
@@ -35,13 +53,30 @@ export default {
     },
   },
   async mounted() {
-    this.lineList = [];// clear previous data
-    const { stopId } = this.$root.$mp.query;
-    const data = await api.station.fetchLines(stopId);
-    this.lineList = data.map(item => ({
-      ...item,
-      work: item.workTimeList && item.workTimeList.join(' - '),
-    }));
+    // clear previous data
+    this.lineList = [];
+    this.activeLineIndex = null;
+    this.loadData();
+  },
+  async onPullDownRefresh() {
+    await this.loadData();
+    wx.stopPullDownRefresh();
+  },
+  methods: {
+    async loadData() {
+      this.loading = true;
+      const { stopId } = this.$root.$mp.query;
+      const data = await api.station.fetchLines(stopId);
+      this.loading = false;
+
+      this.lineList = data.map(item => ({
+        ...item,
+        work: item.workTimeList && item.workTimeList.join(' - '),
+      }));
+    },
+    selectLine(index) {
+      this.activeLineIndex = index;
+    },
   },
 };
 </script>
@@ -49,9 +84,12 @@ export default {
 <style lang="scss" scoped>
 $color-primary: #1aad19;
 
-.container {
-  padding: 1em 0.5em 3em;
-  white-space: nowrap;
+@keyframes circle {
+  100% { transform: rotate(360deg); }
+}
+
+.station {
+  text-align: center;
 
   > h1 {
     font-size: 20px;
@@ -67,28 +105,57 @@ $color-primary: #1aad19;
 
 .line {
   &-list {
-    margin-top: 15px;
+    margin-top: 1em;
   }
 
   &-item {
-    padding: 15px 0;
+    padding: 1em 10px;
     border-top: 1px solid #eee;
+    position: relative;
 
-    > h2 {
-      font-size: 18px;
+    &._active {
+      background: #fafafa;
     }
 
-    > h3 {
+    > h2 {
       font-size: 16px;
-      margin-top: 5px;
-      color: #999;
+    }
+  }
+
+  &-refresh {
+    display: none;
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    opacity: 0.35;
+    height: 20px;
+    width: 20px;
+    transition: opacity 0.8s;
+
+    ._active > & {
+      display: block;
+    }
+
+    &._loading {
+      transition: opacity 0.1s;
+      opacity: 0.05;
+      animation: circle 0.5s linear infinite;
     }
   }
 
   &-work {
-    font-size: 16px;
-    color: #999;
     margin-top: 5px;
+  }
+
+  &-info {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #999;
+    opacity: 0.3;
+
+    ._active > & {
+      opacity: 1;
+    }
   }
 }
 
