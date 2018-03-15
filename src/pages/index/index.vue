@@ -1,0 +1,107 @@
+<template>
+  <div class="container">
+    <div class="station-list">
+      <a
+        class="station-item"
+        v-for="item in stationList"
+        :key="item.stopId"
+        :href="'/pages/detail/detail?stopId=' + item.stopId"
+        @click="setCurrent(item)"
+      >
+        <h2>{{item.name}}</h2>
+        <h3>{{item.direction}}</h3>
+        <ul class="station-lines">
+          <li
+            v-for="(line, lineId) in item.lineList"
+            :key="lineId"
+            >{{line}}</li>
+        </ul>
+        <div class="station-dist">{{item.dist}}米</div>
+      </a>
+    </div>
+  </div>
+</template>
+
+<script>
+import api from '@/api';
+import store from '@/store';
+
+const terminusDirection = '终点站';
+export default {
+  data() {
+    return {
+      stationList: [],
+    };
+  },
+  async mounted() {
+    const { longitude, latitude } = await new Promise((resolve) => {
+      wx.getLocation({
+        success(res) {
+          resolve(res);
+        },
+      });
+    });
+    const coordinates = [longitude, latitude];
+    const stationList = await api.station.listNearby(coordinates);
+    this.stationList = stationList.map(item => ({
+      ...item,
+      direction: item.direction === terminusDirection
+        ? terminusDirection
+        : `行车方向：${item.direction}`,
+      lineList: item.lineList.split('、'),
+      dist: Math.round(item.dist),
+    }));
+  },
+  methods: {
+    setCurrent(item) {
+      store.dispatch('setCurrentStation', item);
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+$color-primary: #1aad19;
+
+.station {
+  &-item {
+    padding: 1em 0.5em;
+    border-bottom: 1px solid #f5f5f5;
+
+    > h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    > h3 {
+      font-size: 16px;
+      margin-top: 5px;
+      color: #666;
+    }
+  }
+
+  &-lines {
+    margin-top: 5px;
+
+    > li {
+      display: inline-block;
+      padding: 0 0.5em;
+      line-height: 1.5;
+      font-size: 14px;
+      color: #fff;
+      background: $color-primary;
+      border-radius: 3px;
+
+      + li {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  &-dist {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #999;
+  }
+}
+</style>
