@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       lineList: [],
-      activeLineIndex: null,
+      activeLineIndex: 0,
       loading: false,
     };
   },
@@ -63,7 +63,7 @@ export default {
   async mounted() {
     // clear previous data
     this.lineList = [];
-    this.activeLineIndex = null;
+    this.activeLineIndex = 0;
 
     wx.setNavigationBarTitle({
       title: this.station.name,
@@ -135,11 +135,11 @@ export default {
 
   &-item {
     padding: 1em 10px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid $border-color;
     position: relative;
 
     &._active {
-      background: #fafafa;
+      background: $bg-dark;
     }
 
     > h2 {
@@ -155,7 +155,7 @@ export default {
     opacity: 0.35;
     height: 20px;
     width: 20px;
-    transition: opacity 0.8s;
+    transition: opacity 2s;
 
     ._active > & {
       display: block;
