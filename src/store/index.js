@@ -8,9 +8,11 @@ Vue.use(Vuex);
  * cacheKey of likedStationDic
  */
 const LIKED_STATION_DIC = 'likedStationDic';
+const LIKED_LINE_DIC = 'likedLineDic';
 const state = {
   currentStation: {},
   likedStationDic: wx.getStorageSync(LIKED_STATION_DIC) || {},
+  likedLineDic: wx.getStorageSync(LIKED_LINE_DIC) || {},
 };
 
 const actions = {
@@ -24,6 +26,13 @@ const actions = {
   unlikeStation(ctx, data) {
     ctx.commit(types.UNLIKE_STATION, data);
   },
+
+  likeLine(ctx, data) {
+    ctx.commit(types.LIKE_LINE, data);
+  },
+  unlikeLine(ctx, data) {
+    ctx.commit(types.UNLIKE_LINE, data);
+  },
 };
 
 const mutations = {
@@ -32,6 +41,8 @@ const mutations = {
   },
 
   [types.LIKE_STATION](state, station) {
+    delete station.dist;
+
     state.likedStationDic = {
       ...state.likedStationDic,
       [station.stopId]: station,
@@ -39,13 +50,28 @@ const mutations = {
     wx.setStorageSync(LIKED_STATION_DIC, state.likedStationDic);
   },
   [types.UNLIKE_STATION](state, station) {
-    // delete state.likedStationDic[station.stopId];
-    Vue.delete(state.likedStationDic, station.stopId);
+    delete state.likedStationDic[station.stopId];
 
     state.likedStationDic = {
       ...state.likedStationDic,
     };
     wx.setStorageSync(LIKED_STATION_DIC, state.likedStationDic);
+  },
+
+  [types.LIKE_LINE](state, line) {
+    state.likedLineDic = {
+      ...state.likedLineDic,
+      [line.name]: {},
+    };
+    wx.setStorageSync(LIKED_LINE_DIC, state.likedLineDic);
+  },
+  [types.UNLIKE_LINE](state, line) {
+    delete state.likedLineDic[line.name];
+
+    state.likedLineDic = {
+      ...state.likedLineDic,
+    };
+    wx.setStorageSync(LIKED_LINE_DIC, state.likedLineDic);
   },
 };
 

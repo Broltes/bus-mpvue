@@ -22,22 +22,13 @@
 
 <script>
 import store from '@/store';
+import stationMapper from '@/app/stationMapper';
 
 export default {
   props: ['list'],
   computed: {
     stationList() {
-      const terminusDirection = '终点站';
-
-      return this.list.map(item => (item.mapped ? item : {
-        ...item,
-        direction: item.direction === terminusDirection
-          ? terminusDirection
-          : `行车方向：${item.direction}`,
-        lineList: item.lineList.split('、'),
-        dist: Math.round(item.dist),
-        mapped: true,
-      }));
+      return stationMapper(this.list);
     },
   },
   methods: {

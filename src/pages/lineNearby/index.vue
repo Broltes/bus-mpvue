@@ -1,12 +1,12 @@
 <template>
   <div class="container">
-    <search-nav placeholder="搜索站牌" url="/pages/stationSearch/stationSearch"></search-nav>
+    <search-nav placeholder="搜索公交线路" url="/pages/lineSearch/lineSearch"></search-nav>
 
-    <h2 v-if="likedList[0]">收藏的公交站牌</h2>
-    <station-list :list="likedList"></station-list>
+    <h2 v-if="likedList[0]">收藏的公交线路</h2>
+    <line-list :list="likedList"></line-list>
 
-    <h2>附近公交站牌</h2>
-    <station-list :list="nearbyList"></station-list>
+    <h2>附近的公交线路</h2>
+    <line-list :list="nearbyList"></line-list>
   </div>
 </template>
 
@@ -15,12 +15,12 @@ import api from '@/api';
 import store from '@/store';
 import * as util from '@/common/util';
 import SearchNav from '@/components/SearchNav';
-import StationList from '@/components/StationList';
+import LineList from '@/components/LineList';
 
 export default {
   components: {
     'search-nav': SearchNav,
-    'station-list': StationList,
+    'line-list': LineList,
   },
   data() {
     return {
@@ -29,8 +29,8 @@ export default {
   },
   computed: {
     likedList() {
-      const { likedStationDic } = store.state;
-      const list = Object.values(likedStationDic);
+      const { likedLineDic } = store.state;
+      const list = Object.keys(likedLineDic);
 
       return list;
     },
@@ -50,7 +50,7 @@ export default {
   methods: {
     async loadData() {
       const coordinates = await util.locateCoordinates();
-      this.nearbyList = await api.station.listNearby(coordinates);
+      this.nearbyList = await api.line.listNearby(coordinates);
     },
   },
 };

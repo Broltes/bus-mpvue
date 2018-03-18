@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="station">
-      <div class="direction">{{station.direction}}</div>
+      <div class="direction" @click="loadReverse">{{station.direction}}</div>
 
       <div class="station-like" @click="toggleLike">
         <img v-if="liked" mode="aspectFit" src="/static/img/like_active.png">
@@ -42,14 +42,19 @@
 <script>
 import api from '@/api';
 import store from '@/store';
+import stationMapper from '@/app/stationMapper';
 
+// import toast from '@/base/toast';
+
+const defaultState = {
+  lineList: [],
+  activeLineIndex: 0,
+  loading: false,
+  stopId: null,
+};
 export default {
   data() {
-    return {
-      lineList: [],
-      activeLineIndex: 0,
-      loading: false,
-    };
+    return { ...defaultState };
   },
   computed: {
     station() {
@@ -61,9 +66,11 @@ export default {
     },
   },
   async mounted() {
+    const { stopId } = this.$root.$mp.query;
     // clear previous data
-    this.lineList = [];
-    this.activeLineIndex = 0;
+    Object.assign(this, defaultState, {
+      stopId,
+    });
 
     wx.setNavigationBarTitle({
       title: this.station.name,
@@ -77,14 +84,24 @@ export default {
   methods: {
     async loadData() {
       this.loading = true;
-      const { stopId } = this.$root.$mp.query;
-      const data = await api.station.fetchLines(stopId);
+      const { stopId } = this;
+      const data = await api.station.fetchLines(stopId, this.station.name);
       this.loading = false;
 
       this.lineList = data.map(item => ({
         ...item,
         work: item.workTimeList && item.workTimeList.join(' - '),
       }));
+    },
+
+    async loadReverse() {
+      const { stopId, name } = this.station;
+      const reverseStation = await api.station.fetchReverseStation(stopId, name);
+
+      store.dispatch('setCurrentStation', stationMapper(reverseStation));
+      wx.redirectTo({
+        url: `/pages/stationDetail/stationDetail?stopId=${reverseStation.stopId}`,
+      });
     },
 
     selectLine(index) {
@@ -101,10 +118,6 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/variables.scss';
-
-@keyframes circle {
-  100% { transform: rotate(360deg); }
-}
 
 .station {
   margin-top: 8px;

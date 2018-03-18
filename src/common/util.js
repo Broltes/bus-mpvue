@@ -12,3 +12,15 @@ export function debounce(action, idle) {
     tid = setTimeout(() => action.apply(this, args), idle);
   };
 }
+
+export async function locateCoordinates() {
+  const { longitude, latitude } = await new Promise((resolve) => {
+    wx.getLocation({
+      success(res) {
+        resolve(res);
+      },
+    });
+  });
+
+  return [longitude, latitude];
+}

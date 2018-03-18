@@ -11,3 +11,7 @@ export function search(keyword) {
 export function fetchLines(stopId) {
   return Http.get(`/api/station/${stopId}/lines`);
 }
+
+export function fetchReverseStation(stopId, name) {
+  return Http.get(`/api/station/reverse/${stopId}/${name}`);
+}

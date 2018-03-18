@@ -23,31 +23,25 @@ export default {
       navigationBarTitleText: '电子公交牌',
       navigationBarTextStyle: 'black',
     },
-    // tabBar: {
-    //   color: '#999',
-    //   selectedColor: '#1aad19',
-    //   backgroundColor: '#fff',
-    //   borderStyle: 'black',
-    //   list: [
-    //     {
-    //       pagePath: 'pages/stationNearby/stationNearby',
-    //       text: '站牌',
-    //       iconPath: 'static/img/station.png',
-    //       selectedIconPath: 'static/img/station_active.png',
-    //     },
-    //     {
-    //       pagePath: 'pages/stationNearby/stationNearby',
-    //       text: '收藏',
-    //       iconPath: 'static/img/like.png',
-    //       selectedIconPath: 'static/img/like_active.png',
-    //     },
-    //     {
-    //       pagePath: 'pages/stationNearby/stationNearby',
-    //       text: '线路',
-    //       iconPath: 'static/img/line.png',
-    //       selectedIconPath: 'static/img/line_active.png',
-    //     },
-    //   ],
-    // },
+    tabBar: {
+      color: '#999',
+      selectedColor: '#1aad19',
+      backgroundColor: '#fff',
+      borderStyle: 'black',
+      list: [
+        {
+          pagePath: 'pages/stationNearby/stationNearby',
+          text: '站牌',
+          iconPath: 'static/img/station.png',
+          selectedIconPath: 'static/img/station_active.png',
+        },
+        {
+          pagePath: 'pages/lineNearby/lineNearby',
+          text: '线路',
+          iconPath: 'static/img/line.png',
+          selectedIconPath: 'static/img/line_active.png',
+        },
+      ],
+    },
   },
 };
