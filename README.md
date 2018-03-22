@@ -2,6 +2,8 @@
 
 > Bus plate Mini Program
 
+![电子公交牌](./qrcode.jpeg)
+
 ## Build Setup
 
 ``` bash
